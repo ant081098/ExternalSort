@@ -5,8 +5,8 @@ project(ExternalSort LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCES main.cpp sortmanager.cpp iface/inputdata.cpp commandlinearg.cpp)
-set(HEADERS sortmanager.h iface/inputdata.h commandlinearg.h)
+set(SOURCES main.cpp sortmanager.cpp iface/ioptions.cpp iface/isorting.cpp commandlinearg.cpp externalsort.cpp)
+set(HEADERS sortmanager.h iface/ioptions.h iface/isorting.h commandlinearg.h externalsort.h)
 
 add_executable(ExternalSort ${SOURCES} ${HEADERS})
 

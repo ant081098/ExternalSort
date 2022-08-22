@@ -3,14 +3,15 @@
 #include <map>
 #include <vector>
 
-#include "iface/inputdata.h"
+#include "iface/ioptions.h"
 
-struct CommandLineArg : public InputData
+struct CommandLineArg : public IOptions
 {
     CommandLineArg(int argc, char* argv[]);
-    bool prepareData();
-    std::string operator()(const std::string& key) const;
-    ~CommandLineArg();
+    ~CommandLineArg() override;
+    bool prepareData() override;
+    std::string param(const std::string& key) const override;
+
 
 protected:
     bool parse();

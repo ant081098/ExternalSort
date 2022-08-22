@@ -4,11 +4,16 @@
 
 using namespace std;
 
-CommandLineArg::CommandLineArg(int argc, char *argv[]) : InputData()
+CommandLineArg::CommandLineArg(int argc, char *argv[]) : IOptions()
 {
     m_listArgv.reserve(argc);
     for(int i=0;i<argc;i++)
         m_listArgv.push_back(argv[i]);
+}
+
+CommandLineArg::~CommandLineArg()
+{
+
 }
 
 bool CommandLineArg::prepareData()
@@ -16,14 +21,9 @@ bool CommandLineArg::prepareData()
     return parse();
 }
 
-string CommandLineArg::operator()(const std::string &key) const
+string CommandLineArg::param(const std::string &key) const
 {
     return m_arguments.at(key); //Check exist key!
-}
-
-CommandLineArg::~CommandLineArg()
-{
-
 }
 
 bool CommandLineArg::parse()
