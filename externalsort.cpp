@@ -24,7 +24,7 @@ void ExternalSort::setOptions(IOptions *options)
 void ExternalSort::run()
 {
     auto filenameParts = split();
-    //merge(filenameParts);
+    merge(filenameParts);
 
 }
 
@@ -44,7 +44,7 @@ std::vector<string> ExternalSort::split()
         if(part == m_countParts - 1){
             file.writeBlockIntoFile(filename, offset, inputfileSize - offset, true);
         } else {
-            offset += file.writeBlockIntoFile(filename, offset, blockSize);
+            offset += file.writeBlockIntoFile(filename, offset, blockSize) + 1;
         }
         vecFilenameParts.push_back(filename);
     }
@@ -56,7 +56,7 @@ std::vector<string> ExternalSort::split()
 void ExternalSort::merge(std::vector<std::string> &vecFilenameParts)
 {
     for(auto& filename : vecFilenameParts){
-        sort(filename);
+        //sort(filename);
     }
 
 }
