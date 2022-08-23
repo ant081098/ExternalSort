@@ -12,10 +12,12 @@ SortManager::~SortManager()
 
 }
 
-void SortManager::setOptions(IOptions *options)
+bool SortManager::setOptions(IOptions *options)
 {
     m_options = unique_ptr<IOptions>(options);
-    m_options->prepareData();
+    if(!options->prepareData())
+        return false;
+    return true;
 }
 
 void SortManager::sort(ISorting* sorting)

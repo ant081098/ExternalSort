@@ -8,8 +8,11 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     SortManager manager;
-    manager.setOptions(new CommandLineArg(argc, argv));
-    manager.sort(new ExternalSort());
+    if(manager.setOptions(new CommandLineArg(argc, argv))){
+        manager.sort(new ExternalSort());
+    } else{
+        cout<<"Invalid argv" << endl;
+    }
 
 
     return 0;

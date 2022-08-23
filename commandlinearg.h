@@ -9,9 +9,9 @@ struct CommandLineArg : public IOptions
 {
     CommandLineArg(int argc, char* argv[]);
     ~CommandLineArg() override;
+
     bool prepareData() override;
     std::string param(const std::string& key) const override;
-
 
 protected:
     bool parse();

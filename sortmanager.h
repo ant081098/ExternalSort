@@ -9,9 +9,9 @@ struct SortManager
 {
 public:
     SortManager();
-    void setOptions(IOptions* options);
-    void sort();
     ~SortManager();
+    bool setOptions(IOptions* options);
+    void sort(ISorting* sorting);
 
 protected:
     void splitFileIntoParts();

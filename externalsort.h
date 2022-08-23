@@ -11,9 +11,8 @@ struct ExternalSort : public ISorting
     void run() override;
 
 protected:
-    void split(std::string filename, int parts);
-    void sort();
-    void merge(std::vector<std::string> listFilename);
+    std::vector<std::string> split();
+    void merge(std::vector<std::string>& vecFilenameParts);
 private:
     std::string m_inputFilename, m_outputFilename;
     int m_countParts;
