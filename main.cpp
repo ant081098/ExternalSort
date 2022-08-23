@@ -11,9 +11,8 @@ int main(int argc, char* argv[])
     if(manager.setOptions(new CommandLineArg(argc, argv))){
         manager.sort(new ExternalSort());
     } else{
-        cout<<"Invalid argv" << endl;
+        cout<<"Invalid arguments\nsorting -i <input> -o <output> [-d <parts>]\n" << endl;
     }
-
 
     return 0;
 }

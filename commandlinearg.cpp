@@ -1,5 +1,4 @@
 #include "commandlinearg.h"
-
 #include <algorithm>
 
 using namespace std;
@@ -32,7 +31,7 @@ bool CommandLineArg::parse()
     while(key != end(m_listArgv)){
         key = find_if(key, end(m_listArgv), [](string& param){
                 return param.front() == '-';
-        });
+    });
         if(key == end(m_listArgv)) break;
         auto value = next(key);
         if(value == end(m_listArgv)) break;
@@ -51,7 +50,6 @@ bool CommandLineArg::checkValidArguments()
     if(!(m_arguments.count("-o") && m_arguments.count("-i"))){
         return false;
     }
-
     if(m_arguments.count("-d")){
         try {
             auto delims = stoi(m_arguments["-d"]);
@@ -61,7 +59,7 @@ bool CommandLineArg::checkValidArguments()
             return false;
         }
     } else{
-        m_arguments["-d"] = "1";
+        m_arguments["-d"] = "100";
     }
     return true;
 }

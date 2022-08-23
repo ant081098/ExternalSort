@@ -1,8 +1,10 @@
 #include "externalsort.h"
 #include "sortfile.h"
+#include "partfile.h"
+
 using namespace std;
 
-ExternalSort::ExternalSort() : ISorting()
+ExternalSort::ExternalSort() : ISorting(), m_inputFilename(""), m_outputFilename(""), m_countParts(1)
 {
 
 }
@@ -14,7 +16,6 @@ ExternalSort::~ExternalSort()
 
 void ExternalSort::setOptions(IOptions *options)
 {
-
     m_inputFilename = options->param("-i");
     m_countParts = stoi(options->param("-d"));
     m_outputFilename = options->param("-o");
@@ -22,7 +23,8 @@ void ExternalSort::setOptions(IOptions *options)
 
 void ExternalSort::run()
 {
-    split();
+    auto filenameParts = split();
+    //merge(filenameParts);
 
 }
 
@@ -32,24 +34,35 @@ std::vector<string> ExternalSort::split()
     vecFilenameParts.reserve(m_countParts);
 
     SortFile file(m_inputFilename);
-    long inputfileSize = 0L; file.getSize();
-    long blockSize = inputfileSize / m_countParts;
 
+    long inputfileSize = file.getSize();
+    long blockSize = inputfileSize / m_countParts;
     long offset = 0L;
+
     for (int part = 0; part< m_countParts; ++part){
         string filename = m_inputFilename + ".part" + std::to_string(part);
-        long recordedBlockSize = file.writeBlockIntoFile(filename, offset, blockSize);
-        offset+=recordedBlockSize;
-        if(part == m_countParts-1 && offset < inputfileSize){
-            file.writeBlockIntoFile(filename, offset, inputfileSize - offset);
+        if(part == m_countParts - 1){
+            file.writeBlockIntoFile(filename, offset, inputfileSize - offset, true);
+        } else {
+            offset += file.writeBlockIntoFile(filename, offset, blockSize);
         }
         vecFilenameParts.push_back(filename);
     }
+
     return move(vecFilenameParts);
 }
 
 
 void ExternalSort::merge(std::vector<std::string> &vecFilenameParts)
 {
+    for(auto& filename : vecFilenameParts){
+        sort(filename);
+    }
 
+}
+
+void ExternalSort::sort(std::string filename)
+{
+    auto block = PartFile(filename);
+    block.sorting();
 }
