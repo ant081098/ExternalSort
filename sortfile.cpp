@@ -26,7 +26,13 @@ long SortFile::writeBlockIntoFile(string filename, long offset, long blockSize, 
     m_file.seekg(offset, ios::beg);
     m_file.read(buffer.get(), blockSize);
 
-    while(!lastBlock && blockSize > 0 && buffer.get()[--blockSize]!='\n');
+    while(!lastBlock && blockSize > 0){
+        if(buffer.get()[blockSize]=='\n'){
+            blockSize += 1;
+            break;
+        }
+        --blockSize;
+    }
 
     ofstream outFile(filename, ios::out | ios::binary);
     outFile.write(buffer.get(), blockSize);

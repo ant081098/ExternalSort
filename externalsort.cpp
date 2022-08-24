@@ -1,6 +1,7 @@
 #include "externalsort.h"
 #include "sortfile.h"
 #include "partfile.h"
+#include "mergefile.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ std::vector<string> ExternalSort::split()
         if(part == m_countParts - 1){
             file.writeBlockIntoFile(filename, offset, inputfileSize - offset, true);
         } else {
-            offset += file.writeBlockIntoFile(filename, offset, blockSize) + 1;
+            offset += file.writeBlockIntoFile(filename, offset, blockSize);
         }
         vecFilenameParts.push_back(filename);
     }
@@ -56,8 +57,10 @@ std::vector<string> ExternalSort::split()
 void ExternalSort::merge(std::vector<std::string> &vecFilenameParts)
 {
     for(auto& filename : vecFilenameParts){
-        //sort(filename);
+        sort(filename);
     }
+    auto merge = MergeFile(vecFilenameParts);
+    merge.sortMerge(m_outputFilename);
 
 }
 

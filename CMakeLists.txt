@@ -14,6 +14,7 @@ set(SOURCES main.cpp
             externalsort.cpp
             sortfile.cpp
             partfile.cpp
+            mergefile.cpp
         )
 set(HEADERS sortmanager.h
             iface/ioptions.h
@@ -23,6 +24,7 @@ set(HEADERS sortmanager.h
             externalsort.h
             sortfile.h
             partfile.h
+            mergefile.h
         )
 
 add_executable(ExternalSort ${SOURCES} ${HEADERS})
