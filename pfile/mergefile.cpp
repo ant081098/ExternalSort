@@ -1,5 +1,5 @@
 #include "mergefile.h"
-
+#include "exceptfile.h"
 #include <map>
 #include <queue>
 
@@ -10,7 +10,9 @@ MergeFile::MergeFile(const vector<string>& parts) : m_ready(true)
     m_files.resize(parts.size());
     for(size_t i = 0; i<parts.size(); i++){
         m_files[i].open(parts[i]);
-        m_ready &= m_files[i].is_open();
+        if(!m_files[i].is_open()){
+            throw ExceptFile(ExceptFile::Step::SORT_PARTS, "File '" + parts[i] + "' not found");
+        }
     }
 }
 
@@ -26,14 +28,11 @@ MergeFile::~MergeFile()
 bool MergeFile::merge(std::string filename)
 {
     multimap<pair<string, string>, int> heap;
-    if(!ready())
-        return false;
 
     for(size_t i = 0; i< m_files.size(); i++){
-        if(m_files[i].eof()) continue;
-
         string buffer;
         getline(m_files[i], buffer, '\n');
+        if(m_files[i].eof()) continue;
         auto separator = buffer.find(':');
         string key = buffer.substr(0, separator);
         string value = buffer.substr(separator + 1);
@@ -47,9 +46,9 @@ bool MergeFile::merge(std::string filename)
         auto line = begin(heap)->first.first + ":" + begin(heap)->first.second + "\n";
         outFile << line;
         heap.erase(begin(heap));
-        if(m_files[indexFile].eof()) continue;
         string buffer;
         getline(m_files[indexFile], buffer, '\n');
+        if(m_files[indexFile].eof()) continue;
         auto separator = buffer.find(':');
         string key = buffer.substr(0, separator);
         string value = buffer.substr(separator + 1);

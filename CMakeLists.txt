@@ -16,6 +16,7 @@ set(SOURCES main.cpp
             pfile/splitfile.cpp
             pfile/sortfile.cpp
             pfile/mergefile.cpp
+            pfile/exceptfile.cpp
         )
 
 set(HEADERS sortmanager.h
@@ -28,6 +29,7 @@ set(HEADERS sortmanager.h
             pfile/splitfile.h
             pfile/sortfile.h
             pfile/mergefile.h
+            pfile/exceptfile.h
         )
 
 add_executable(ExternalSort ${SOURCES} ${HEADERS})

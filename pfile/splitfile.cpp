@@ -1,17 +1,18 @@
 #include "splitfile.h"
+#include "exceptfile.h"
 #include <memory>
 #include <filesystem>
 
 using namespace std;
 
-SplitFile::SplitFile(std::string filename)
+SplitFile::SplitFile(std::string filename) : m_filename(filename)
 {
 
 }
 
 SplitFile::~SplitFile()
 {
-    removeParts();
+    //removeParts();
 }
 
 std::vector<string> SplitFile::getParts() const
@@ -32,7 +33,7 @@ bool SplitFile::split(int countBlock)
 
     ifstream file(m_filename, ios::binary | ios::in);
     if(!file.is_open()){
-        return false;
+        throw ExceptFile(ExceptFile::Step::SPLIT, "File '" + m_filename + "' not found");
     }
 
     long sizeFile = getFileSize(file);
@@ -44,9 +45,9 @@ bool SplitFile::split(int countBlock)
         unique_ptr<char> buffer;
         auto bufferSize = 0L;
         if(block == countBlock - 1){
-            bufferSize = readBlock(file, buffer.get(), offsetFile, sizeFile - offsetFile, true);
+            bufferSize = readBlock(file, buffer, offsetFile, sizeFile - offsetFile, true);
         } else {
-            bufferSize = readBlock(file, buffer.get(), offsetFile, sizeBlock);
+            bufferSize = readBlock(file, buffer, offsetFile, sizeBlock);
             offsetFile += bufferSize;
         }
         writeBlock(filename, buffer.get(), bufferSize);
@@ -63,18 +64,21 @@ long SplitFile::getFileSize(ifstream& file) const
     return file.tellg();
 }
 
-void SplitFile::writeBlock(std::string filename, char *buffer, long size)
+void SplitFile::writeBlock(std::string filename, const char *buffer, long size)
 {
     ofstream outFile(filename, ios::out | ios::binary);
+    if(!outFile.is_open()){
+        throw ExceptFile(ExceptFile::Step::SPLIT, "Failed output in '" + filename + "'");
+    }
     outFile.write(buffer, size);
     outFile.close();
 }
 
-long SplitFile::readBlock(std::ifstream &file, char* buffer, long offset, long size, bool lastBlock)
+long SplitFile::readBlock(std::ifstream &file, std::unique_ptr<char>& buffer, long offset, long size, bool lastBlock)
 {
-    buffer = new char[size];
+    buffer = unique_ptr<char>(new char[size]);
     file.seekg(offset, ios::beg);
-    file.read(buffer, size);
-    for(;!lastBlock && size > 0 && buffer[size - 1] != '\n' ; size--);
+    file.read(buffer.get(), size);
+    for(;!lastBlock && size > 0 && buffer.get()[size - 1] != '\n' ; size--);
     return size;
 }

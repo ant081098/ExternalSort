@@ -27,12 +27,12 @@ void ExternalSort::setOptions(IOptions *options)
 void ExternalSort::run()
 {
     SplitFile stepSplit(m_inputFilename);
-    if(stepSplit.split(m_countParts)){
-        for(auto& filename : stepSplit.getParts()){
-            SortFile stepSort(filename);
-            stepSort.sort();
-        }
-        MergeFile stepMerge(stepSplit.getParts());
-        stepMerge.merge(m_outputFilename);
+    stepSplit.split(m_countParts);
+    for(auto& filename : stepSplit.getParts()){
+        SortFile stepSort(filename);
+        stepSort.sort();
     }
+    MergeFile stepMerge(stepSplit.getParts());
+    stepMerge.merge(m_outputFilename);
+
 }

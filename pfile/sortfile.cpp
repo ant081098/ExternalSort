@@ -1,5 +1,5 @@
 #include "sortfile.h"
-
+#include "exceptfile.h"
 #include <queue>
 #include <map>
 #include <fstream>
@@ -22,6 +22,10 @@ void SortFile::sort()
     multimap<string, string> mapData;
     file.open(m_filename, ios::in);
 
+    if(!file.is_open()) {
+        throw ExceptFile(ExceptFile::Step::SORT_PARTS, "File '" + m_filename + "' not found");
+    }
+
     for(string buffer; getline(file, buffer, '\n');){
         auto separator = buffer.find(':');
         string key = buffer.substr(0, separator);
@@ -31,6 +35,9 @@ void SortFile::sort()
     file.close();
 
     file.open(m_filename, ios::out);
+    if(!file.is_open()) {
+        throw ExceptFile(ExceptFile::Step::SORT_PARTS, "Failed output in '" + m_filename + "'");
+    }
     for(auto& [key, value] : mapData){
         file << key << ":" << value << "\n";
     }
