@@ -53,7 +53,7 @@ bool CommandLineArg::checkValidArguments()
     if(m_arguments.count("-d")){
         try {
             auto delims = stoi(m_arguments["-d"]);
-            if(delims < 0 || delims > 100)
+            if(delims < 0 || delims > 500)
                 throw invalid_argument("Invalid range");
         } catch(invalid_argument &e){
             return false;

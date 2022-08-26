@@ -3,6 +3,8 @@
 #include <memory>
 #include <filesystem>
 
+#include "../iface/ilog.h"
+
 using namespace std;
 
 SplitFile::SplitFile(std::string filename) : m_filename(filename)
@@ -30,7 +32,6 @@ void SplitFile::removeParts()
 bool SplitFile::split(int countBlock)
 {
     m_parts.reserve(countBlock);
-
     ifstream file(m_filename, ios::binary | ios::in);
     if(!file.is_open()){
         throw ExceptFile(ExceptFile::Step::SPLIT, "File '" + m_filename + "' not found");
@@ -44,12 +45,16 @@ bool SplitFile::split(int countBlock)
         auto filename = m_filename + ".part." + std::to_string(block);
         unique_ptr<char> buffer;
         auto bufferSize = 0L;
+
+        ILog("\t\tread: " + m_filename);
         if(block == countBlock - 1){
             bufferSize = readBlock(file, buffer, offsetFile, sizeFile - offsetFile, true);
         } else {
             bufferSize = readBlock(file, buffer, offsetFile, sizeBlock);
             offsetFile += bufferSize;
         }
+
+        ILog("\t\twrite: " + filename);
         writeBlock(filename, buffer.get(), bufferSize);
         m_parts.push_back(filename);
     }
@@ -72,6 +77,7 @@ void SplitFile::writeBlock(std::string filename, const char *buffer, long size)
     }
     outFile.write(buffer, size);
     outFile.close();
+
 }
 
 long SplitFile::readBlock(std::ifstream &file, std::unique_ptr<char>& buffer, long offset, long size, bool lastBlock)

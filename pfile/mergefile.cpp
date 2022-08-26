@@ -4,6 +4,8 @@
 #include <map>
 #include <queue>
 
+#include "../iface/ilog.h"
+
 using namespace std;
 
 MergeFile::MergeFile(const vector<string>& parts) : m_ready(true)
@@ -28,6 +30,7 @@ bool MergeFile::merge(std::string filename)
 {
     multimap<FileLine, int> heapLines;
 
+    ILog("\tstart fill heap");
     for(size_t i = 0; i< m_files.size(); i++){
         auto opt = getNextLine(i);
         if(!opt->empty()) {
@@ -35,12 +38,25 @@ bool MergeFile::merge(std::string filename)
             heapLines.insert(make_pair(line, i));
         }
     }
+    ILog("\tfinish fill heap");
+
+    long long cnt = 0;
+    auto tm = ILog::getTime();
+
 
     ofstream outFile(filename);
     while(!heapLines.empty()){
         auto indexFile = begin(heapLines)->second;
         auto line = begin(heapLines)->first;
         outFile << line.toLine() << "\n";
+
+
+        cnt++;
+        if (ILog::getTime() - tm > 10){
+            tm = ILog::getTime();
+            ILog("\twrite records (" + to_string(cnt) + ")");
+        }
+
         heapLines.erase(begin(heapLines));
         auto opt = getNextLine(indexFile);
         if(!opt->empty()){
