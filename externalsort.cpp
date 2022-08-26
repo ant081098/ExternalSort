@@ -36,13 +36,13 @@ void ExternalSort::run()
     stepSplit.split(m_countParts);
     ILog("finish split (" + to_string(ILog::getTime() - tm) + " sec)");
 
-    tm = ILog::getTime();
-    ILog("start sort");
-    for(auto& filename : stepSplit.getParts()){
-        SortFile stepSort(filename);
-        stepSort.sort();
-    }
-    ILog("finish sort (" + to_string(ILog::getTime() - tm) + " sec)");
+//    tm = ILog::getTime();
+//    ILog("start sort");
+//    for(auto& filename : stepSplit.getParts()){
+//        SortFile stepSort(filename);
+//        stepSort.sort();
+//    }
+//    ILog("finish sort (" + to_string(ILog::getTime() - tm) + " sec)");
 
     tm = ILog::getTime();
     ILog("start merge");
