@@ -1,5 +1,6 @@
 #include "mergefile.h"
 #include "exceptfile.h"
+#include "fileline.h"
 #include <map>
 #include <queue>
 
@@ -23,37 +24,29 @@ MergeFile::~MergeFile()
     }
 }
 
-
-
 bool MergeFile::merge(std::string filename)
 {
-    multimap<pair<string, string>, int> heap;
+    multimap<FileLine, int> heapLines;
 
     for(size_t i = 0; i< m_files.size(); i++){
-        string buffer;
-        getline(m_files[i], buffer, '\n');
-        if(m_files[i].eof()) continue;
-        auto separator = buffer.find(':');
-        string key = buffer.substr(0, separator);
-        string value = buffer.substr(separator + 1);
-        auto pair = make_pair(key, value);
-        heap.insert(make_pair(pair, i));
+        auto opt = getNextLine(i);
+        if(!opt->empty()) {
+            FileLine line(opt.value());
+            heapLines.insert(make_pair(line, i));
+        }
     }
 
     ofstream outFile(filename);
-    while(!heap.empty()){
-        auto indexFile = begin(heap)->second;
-        auto line = begin(heap)->first.first + ":" + begin(heap)->first.second + "\n";
-        outFile << line;
-        heap.erase(begin(heap));
-        string buffer;
-        getline(m_files[indexFile], buffer, '\n');
-        if(m_files[indexFile].eof()) continue;
-        auto separator = buffer.find(':');
-        string key = buffer.substr(0, separator);
-        string value = buffer.substr(separator + 1);
-        auto pair = make_pair(key, value);
-        heap.insert(make_pair(pair, indexFile));
+    while(!heapLines.empty()){
+        auto indexFile = begin(heapLines)->second;
+        auto line = begin(heapLines)->first;
+        outFile << line.toLine() << "\n";
+        heapLines.erase(begin(heapLines));
+        auto opt = getNextLine(indexFile);
+        if(!opt->empty()){
+            line.fromLine(opt.value());
+            heapLines.insert(make_pair(move(line), indexFile));
+        }
     }
     outFile.close();
     return true;
@@ -63,4 +56,12 @@ bool MergeFile::merge(std::string filename)
 bool MergeFile::ready() const
 {
     return m_ready;
+}
+
+std::optional<string> MergeFile::getNextLine(size_t indexFile)
+{
+    string buffer;
+    getline(m_files[indexFile], buffer, '\n');
+    if(m_files[indexFile].eof()) return {};
+    return { move(buffer) };
 }

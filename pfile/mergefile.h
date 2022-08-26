@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <vector>
+#include <optional>
 
 struct MergeFile
 {
@@ -11,6 +12,7 @@ struct MergeFile
     bool merge(std::string filename);
 protected:
     bool ready() const;
+    std::optional<std::string> getNextLine(size_t indexFile);
 private:
     bool m_ready;
     std::vector<std::fstream> m_files;

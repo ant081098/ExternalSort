@@ -8,7 +8,8 @@ struct ExceptFile : public std::exception
     enum Step {
         SPLIT,
         SORT_PARTS,
-        MERGE
+        MERGE,
+        READ_FILE
     };
 
     ExceptFile(Step step, std::string message);

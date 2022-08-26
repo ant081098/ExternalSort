@@ -11,6 +11,7 @@ std::string ExceptFile::step() const
     case Step::SPLIT: return "{SPLIT}";
     case Step::SORT_PARTS: return "{SORT PARTS}";
     case Step::MERGE: return "{MERGE}";
+    case Step::READ_FILE: return "{READ_FILE}";
     default: return "{UNKNOW}";
     }
 }

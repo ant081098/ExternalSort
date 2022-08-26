@@ -13,6 +13,7 @@ set(SOURCES main.cpp
             iface/isorting.cpp
             iface/ilog.cpp
 
+            pfile/fileline.cpp
             pfile/splitfile.cpp
             pfile/sortfile.cpp
             pfile/mergefile.cpp
@@ -26,6 +27,7 @@ set(HEADERS sortmanager.h
             iface/isorting.h
             iface/ilog.h
 
+            pfile/fileline.h
             pfile/splitfile.h
             pfile/sortfile.h
             pfile/mergefile.h

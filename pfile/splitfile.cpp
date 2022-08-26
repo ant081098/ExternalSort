@@ -12,7 +12,7 @@ SplitFile::SplitFile(std::string filename) : m_filename(filename)
 
 SplitFile::~SplitFile()
 {
-    //removeParts();
+    removeParts();
 }
 
 std::vector<string> SplitFile::getParts() const
