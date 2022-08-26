@@ -14,7 +14,7 @@ struct SplitFile
 protected:
     void removeParts();
     long getFileSize(std::ifstream& file) const;
-    void writeBlock(std::string filename, const char* buffer, long size);
+    void writeBlock(std::string filename, char* buffer, long size);
     long readBlock(std::ifstream& file, std::unique_ptr<char>& buffer, long offset, long size, bool lastBlock = false);
 private:
     std::string m_filename;

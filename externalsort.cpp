@@ -1,6 +1,5 @@
 #include "externalsort.h"
 #include "pfile/splitfile.h"
-#include "pfile/sortfile.h"
 #include "pfile/mergefile.h"
 
 #include <iostream>
@@ -36,19 +35,11 @@ void ExternalSort::run()
     stepSplit.split(m_countParts);
     ILog("finish split (" + to_string(ILog::getTime() - tm) + " sec)");
 
-//    tm = ILog::getTime();
-//    ILog("start sort");
-//    for(auto& filename : stepSplit.getParts()){
-//        SortFile stepSort(filename);
-//        stepSort.sort();
-//    }
-//    ILog("finish sort (" + to_string(ILog::getTime() - tm) + " sec)");
-
     tm = ILog::getTime();
     ILog("start merge");
     MergeFile stepMerge(stepSplit.getParts());
     stepMerge.merge(m_outputFilename);
     ILog("finish merge (" + to_string(ILog::getTime() - tm) + " sec)");
 
-    std::cout << ("End (" + to_string(ILog::getTime() - tmBegin) + " sec)");
+    std::cout << ("End (" + to_string(ILog::getTime() - tmBegin) + " sec)") << endl;
 }

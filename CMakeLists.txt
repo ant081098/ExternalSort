@@ -5,6 +5,8 @@ project(ExternalSort LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
 set(SOURCES main.cpp
             sortmanager.cpp
             commandlinearg.cpp
@@ -15,7 +17,6 @@ set(SOURCES main.cpp
 
             pfile/fileline.cpp
             pfile/splitfile.cpp
-            pfile/sortfile.cpp
             pfile/mergefile.cpp
             pfile/exceptfile.cpp
         )
@@ -29,7 +30,6 @@ set(HEADERS sortmanager.h
 
             pfile/fileline.h
             pfile/splitfile.h
-            pfile/sortfile.h
             pfile/mergefile.h
             pfile/exceptfile.h
         )

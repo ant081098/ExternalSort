@@ -1,5 +1,8 @@
 #include "splitfile.h"
 #include "exceptfile.h"
+#include "fileline.h"
+
+#include <set>
 #include <memory>
 #include <filesystem>
 
@@ -46,15 +49,17 @@ bool SplitFile::split(int countBlock)
         unique_ptr<char> buffer;
         auto bufferSize = 0L;
 
-        ILog("\t\tread: " + m_filename);
+        ILog("\t\tread block: " + m_filename);
         if(block == countBlock - 1){
             bufferSize = readBlock(file, buffer, offsetFile, sizeFile - offsetFile, true);
+
         } else {
             bufferSize = readBlock(file, buffer, offsetFile, sizeBlock);
+
             offsetFile += bufferSize;
         }
 
-        ILog("\t\twrite: " + filename);
+        ILog("\t\twrite block: " + filename);
         writeBlock(filename, buffer.get(), bufferSize);
         m_parts.push_back(filename);
     }
@@ -69,13 +74,27 @@ long SplitFile::getFileSize(ifstream& file) const
     return file.tellg();
 }
 
-void SplitFile::writeBlock(std::string filename, const char *buffer, long size)
+void SplitFile::writeBlock(std::string filename, char *buffer, long size)
 {
+    multiset<FileLine> lines;
+    auto pos = buffer;
+    for (long index = 0; index < size; index++) {
+        if(buffer[index]=='\n'){
+            buffer[index] = '\0';
+            lines.insert(FileLine(pos));
+            pos = buffer + (index + 1);
+        }
+    }
+
+    stringstream stream;
+    for(auto& line : lines){
+        stream << line.toLine() << "\n";
+    }
     ofstream outFile(filename, ios::out | ios::binary);
     if(!outFile.is_open()){
         throw ExceptFile(ExceptFile::Step::SPLIT, "Failed output in '" + filename + "'");
     }
-    outFile.write(buffer, size);
+    outFile << stream.rdbuf();
     outFile.close();
 
 }

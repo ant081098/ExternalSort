@@ -69,11 +69,6 @@ bool MergeFile::merge(std::string filename)
 
 }
 
-bool MergeFile::ready() const
-{
-    return m_ready;
-}
-
 std::optional<string> MergeFile::getNextLine(size_t indexFile)
 {
     string buffer;
