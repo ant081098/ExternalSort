@@ -5,11 +5,12 @@
 
 using namespace std;
 
-MergeFile::MergeFile(const vector<string>& vecFilename)
+MergeFile::MergeFile(const vector<string>& parts) : m_ready(true)
 {
-    m_files.resize(vecFilename.size());
-    for(size_t i = 0; i<vecFilename.size(); i++){
-        m_files[i].open(vecFilename[i]);
+    m_files.resize(parts.size());
+    for(size_t i = 0; i<parts.size(); i++){
+        m_files[i].open(parts[i]);
+        m_ready &= m_files[i].is_open();
     }
 }
 
@@ -20,13 +21,19 @@ MergeFile::~MergeFile()
     }
 }
 
-void MergeFile::sortMerge(std::string filename)
+
+
+bool MergeFile::merge(std::string filename)
 {
     multimap<pair<string, string>, int> heap;
+    if(!ready())
+        return false;
+
     for(size_t i = 0; i< m_files.size(); i++){
+        if(m_files[i].eof()) continue;
+
         string buffer;
         getline(m_files[i], buffer, '\n');
-        if(m_files[i].eof()) continue;
         auto separator = buffer.find(':');
         string key = buffer.substr(0, separator);
         string value = buffer.substr(separator + 1);
@@ -40,9 +47,9 @@ void MergeFile::sortMerge(std::string filename)
         auto line = begin(heap)->first.first + ":" + begin(heap)->first.second + "\n";
         outFile << line;
         heap.erase(begin(heap));
+        if(m_files[indexFile].eof()) continue;
         string buffer;
         getline(m_files[indexFile], buffer, '\n');
-        if(m_files[indexFile].eof()) continue;
         auto separator = buffer.find(':');
         string key = buffer.substr(0, separator);
         string value = buffer.substr(separator + 1);
@@ -50,6 +57,11 @@ void MergeFile::sortMerge(std::string filename)
         heap.insert(make_pair(pair, indexFile));
     }
     outFile.close();
+    return true;
 
+}
 
+bool MergeFile::ready() const
+{
+    return m_ready;
 }

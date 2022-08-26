@@ -1,7 +1,9 @@
 #include "externalsort.h"
-#include "sortfile.h"
-#include "partfile.h"
-#include "mergefile.h"
+#include "pfile/splitfile.h"
+#include "pfile/sortfile.h"
+#include "pfile/mergefile.h"
+
+#include <filesystem>
 
 using namespace std;
 
@@ -24,48 +26,13 @@ void ExternalSort::setOptions(IOptions *options)
 
 void ExternalSort::run()
 {
-    auto filenameParts = split();
-    merge(filenameParts);
-
-}
-
-std::vector<string> ExternalSort::split()
-{
-    std::vector<std::string> vecFilenameParts;
-    vecFilenameParts.reserve(m_countParts);
-
-    SortFile file(m_inputFilename);
-
-    long inputfileSize = file.getSize();
-    long blockSize = inputfileSize / m_countParts;
-    long offset = 0L;
-
-    for (int part = 0; part< m_countParts; ++part){
-        string filename = m_inputFilename + ".part" + std::to_string(part);
-        if(part == m_countParts - 1){
-            file.writeBlockIntoFile(filename, offset, inputfileSize - offset, true);
-        } else {
-            offset += file.writeBlockIntoFile(filename, offset, blockSize);
+    SplitFile stepSplit(m_inputFilename);
+    if(stepSplit.split(m_countParts)){
+        for(auto& filename : stepSplit.getParts()){
+            SortFile stepSort(filename);
+            stepSort.sort();
         }
-        vecFilenameParts.push_back(filename);
+        MergeFile stepMerge(stepSplit.getParts());
+        stepMerge.merge(m_outputFilename);
     }
-
-    return move(vecFilenameParts);
-}
-
-
-void ExternalSort::merge(std::vector<std::string> &vecFilenameParts)
-{
-    for(auto& filename : vecFilenameParts){
-        sort(filename);
-    }
-    auto merge = MergeFile(vecFilenameParts);
-    merge.sortMerge(m_outputFilename);
-
-}
-
-void ExternalSort::sort(std::string filename)
-{
-    auto block = PartFile(filename);
-    block.sorting();
 }

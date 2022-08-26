@@ -7,24 +7,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES main.cpp
             sortmanager.cpp
+            commandlinearg.cpp
+            externalsort.cpp
             iface/ioptions.cpp
             iface/isorting.cpp
             iface/ilog.cpp
-            commandlinearg.cpp
-            externalsort.cpp
-            sortfile.cpp
-            partfile.cpp
-            mergefile.cpp
+
+            pfile/splitfile.cpp
+            pfile/sortfile.cpp
+            pfile/mergefile.cpp
         )
+
 set(HEADERS sortmanager.h
+            commandlinearg.h
+            externalsort.h
             iface/ioptions.h
             iface/isorting.h
             iface/ilog.h
-            commandlinearg.h
-            externalsort.h
-            sortfile.h
-            partfile.h
-            mergefile.h
+
+            pfile/splitfile.h
+            pfile/sortfile.h
+            pfile/mergefile.h
         )
 
 add_executable(ExternalSort ${SOURCES} ${HEADERS})
