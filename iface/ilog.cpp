@@ -7,7 +7,7 @@
 
 using namespace std;
 
-ILog::ILog(std::string log)
+ILog::ILog(const std::string& log)
 {
     cout << timeLog() << " " << log << "\n";
 }
@@ -15,13 +15,6 @@ ILog::ILog(std::string log)
 ILog::~ILog()
 {
 
-}
-
-time_t ILog::getTime()
-{
-    auto currentTime = time(0);
-    auto nowTime = localtime(&currentTime);
-    return ((nowTime->tm_hour) * 60 + nowTime->tm_min) * 60 + nowTime->tm_sec;
 }
 
 string ILog::timeLog()

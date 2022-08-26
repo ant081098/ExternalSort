@@ -1,6 +1,6 @@
 #include "exceptfile.h"
 
-ExceptFile::ExceptFile(Step step, std::string message) : m_step(step), m_message(message)
+ExceptFile::ExceptFile(Step step, const std::string& message) : m_step(step), m_message(message)
 {
 
 }

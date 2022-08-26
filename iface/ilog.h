@@ -3,11 +3,12 @@
 #include <string>
 #include <ostream>
 
+//Logging class
 struct ILog : public std::ostream
 {
-    ILog(std::string log);
+    ILog(const std::string& log);
     ~ILog();
 protected:
-    std::string timeLog();
+    std::string timeLog(); //prefix time
 };
 

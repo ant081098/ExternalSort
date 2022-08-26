@@ -2,17 +2,14 @@
 #include "exceptfile.h"
 #include "fileline.h"
 #include <map>
-#include <queue>
-
-#include "../iface/ilog.h"
 
 using namespace std;
 
-MergeFile::MergeFile(const vector<string>& parts) : m_ready(true)
+MergeFile::MergeFile(const vector<string>& parts)
 {
     m_files.resize(parts.size());
     for(size_t i = 0; i<parts.size(); i++){
-        m_files[i].open(parts[i]);
+        m_files[i].open(parts[i]);  //open all parts of file
         if(!m_files[i].is_open()){
             throw ExceptFile(ExceptFile::Step::SORT_PARTS, "File '" + parts[i] + "' not found");
         }
@@ -26,42 +23,29 @@ MergeFile::~MergeFile()
     }
 }
 
-bool MergeFile::merge(std::string filename)
+bool MergeFile::merge(const std::string& filename)
 {
-    multimap<FileLine, int> heapLines;
+    multimap<FileLine, int> heapLines; //autosorting when inserting [Line, IndexFile]
 
-    ILog("\tstart fill heap");
     for(size_t i = 0; i< m_files.size(); i++){
-        auto opt = getNextLine(i);
+        auto opt = getNextLine(i);  //get next line from file by index
         if(!opt->empty()) {
             FileLine line(opt.value());
-            heapLines.insert(make_pair(line, i));
+            heapLines.insert(make_pair(line, i)); //append line in map
         }
     }
-    ILog("\tfinish fill heap");
-
-    long long cnt = 0;
-    auto tm = ILog::getTime();
-
 
     ofstream outFile(filename);
     while(!heapLines.empty()){
-        auto indexFile = begin(heapLines)->second;
-        auto line = begin(heapLines)->first;
-        outFile << line.toLine() << "\n";
+        auto indexFile = begin(heapLines)->second;  //get minimal key
+        auto line = begin(heapLines)->first;    //get minimal pair value
+        outFile << line.toLine() << "\n"; //write in output file
 
-
-        cnt++;
-        if (ILog::getTime() - tm > 10){
-            tm = ILog::getTime();
-            ILog("\twrite records (" + to_string(cnt) + ")");
-        }
-
-        heapLines.erase(begin(heapLines));
-        auto opt = getNextLine(indexFile);
+        heapLines.erase(begin(heapLines));  //Remove recorded line
+        auto opt = getNextLine(indexFile);  //get a new line from the same file
         if(!opt->empty()){
             line.fromLine(opt.value());
-            heapLines.insert(make_pair(move(line), indexFile));
+            heapLines.insert(make_pair(move(line), indexFile)); //append line in map
         }
     }
     outFile.close();
@@ -72,7 +56,7 @@ bool MergeFile::merge(std::string filename)
 std::optional<string> MergeFile::getNextLine(size_t indexFile)
 {
     string buffer;
-    getline(m_files[indexFile], buffer, '\n');
+    getline(m_files[indexFile], buffer, '\n');  //get next line
     if(m_files[indexFile].eof()) return {};
     return { move(buffer) };
 }

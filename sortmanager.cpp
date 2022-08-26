@@ -15,7 +15,7 @@ SortManager::~SortManager()
 bool SortManager::setOptions(IOptions *options)
 {
     m_options = unique_ptr<IOptions>(options);
-    if(!options->prepareData())
+    if(!options->prepareData()) //Prepare and parse arguments cmd
         return false;
     return true;
 }

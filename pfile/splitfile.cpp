@@ -10,7 +10,7 @@
 
 using namespace std;
 
-SplitFile::SplitFile(std::string filename) : m_filename(filename)
+SplitFile::SplitFile(const std::string& filename) : m_filename(filename)
 {
 
 }
@@ -28,13 +28,13 @@ std::vector<string> SplitFile::getParts() const
 void SplitFile::removeParts()
 {
     for(auto& filename : m_parts){
-        filesystem::remove(filename);
+        filesystem::remove(filename);   //remove file
     }
 }
 
 bool SplitFile::split(int countBlock)
 {
-    m_parts.reserve(countBlock);
+    m_parts.reserve(countBlock);    //reserve space
     ifstream file(m_filename, ios::binary | ios::in);
     if(!file.is_open()){
         throw ExceptFile(ExceptFile::Step::SPLIT, "File '" + m_filename + "' not found");
@@ -42,25 +42,26 @@ bool SplitFile::split(int countBlock)
 
     long sizeFile = getFileSize(file);
     long sizeBlock = sizeFile / countBlock;
-    long offsetFile = 0L;
+    long offsetFile = 0L; //Offset for input file
 
     for (int block = 0; block < countBlock; ++block){
-        auto filename = m_filename + ".part." + std::to_string(block);
-        unique_ptr<char> buffer;
+        auto filename = m_filename + ".part." + std::to_string(block); //filename part
+        unique_ptr<char> buffer;    //reserve pointer<char> for content
         auto bufferSize = 0L;
 
-        ILog("\t\tread block: " + m_filename);
-        if(block == countBlock - 1){
+        ILog("\tRead "+ to_string(block + 1) +" block <-- '" + m_filename + "'");
+
+        if(block == countBlock - 1){ //Read last block
             bufferSize = readBlock(file, buffer, offsetFile, sizeFile - offsetFile, true);
 
         } else {
             bufferSize = readBlock(file, buffer, offsetFile, sizeBlock);
 
-            offsetFile += bufferSize;
+            offsetFile += bufferSize;   //modify offset for input file
         }
 
-        ILog("\t\twrite block: " + filename);
-        writeBlock(filename, buffer.get(), bufferSize);
+        ILog("\tWrite block --> '" + filename + "'");
+        writeBlock(filename, buffer.get(), bufferSize); //Write block in part file
         m_parts.push_back(filename);
     }
 
@@ -74,19 +75,19 @@ long SplitFile::getFileSize(ifstream& file) const
     return file.tellg();
 }
 
-void SplitFile::writeBlock(std::string filename, char *buffer, long size)
+void SplitFile::writeBlock(const std::string& filename, char *buffer, long size)
 {
-    multiset<FileLine> lines;
+    multiset<FileLine> lines; //Set lines autosorting by key
     auto pos = buffer;
     for (long index = 0; index < size; index++) {
-        if(buffer[index]=='\n'){
-            buffer[index] = '\0';
-            lines.insert(FileLine(pos));
+        if(buffer[index]=='\n'){    //Find symbol \n
+            buffer[index] = '\0';   //cut string
+            lines.insert(FileLine(pos));  //append line in set
             pos = buffer + (index + 1);
         }
     }
 
-    stringstream stream;
+    stringstream stream; //intermediate buffer
     for(auto& line : lines){
         stream << line.toLine() << "\n";
     }
@@ -94,7 +95,7 @@ void SplitFile::writeBlock(std::string filename, char *buffer, long size)
     if(!outFile.is_open()){
         throw ExceptFile(ExceptFile::Step::SPLIT, "Failed output in '" + filename + "'");
     }
-    outFile << stream.rdbuf();
+    outFile << stream.rdbuf();  //Write stream buffer in output file
     outFile.close();
 
 }
@@ -104,6 +105,8 @@ long SplitFile::readBlock(std::ifstream &file, std::unique_ptr<char>& buffer, lo
     buffer = unique_ptr<char>(new char[size]);
     file.seekg(offset, ios::beg);
     file.read(buffer.get(), size);
+
+    //Find prev symbol '\n'
     for(;!lastBlock && size > 0 && buffer.get()[size - 1] != '\n' ; size--);
     return size;
 }
