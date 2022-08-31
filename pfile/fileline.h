@@ -7,7 +7,7 @@ struct FileLine
 {
     FileLine(const std::string& line);
     ~FileLine();
-    void fromLine(const std::string& line); //convert from string
+    void fromLine(const std::string_view& line); //convert from string
     std::string toLine() const; //Convert to line
     bool operator<(const FileLine& line) const;
 

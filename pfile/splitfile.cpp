@@ -56,7 +56,6 @@ bool SplitFile::split(int countBlock)
 
         } else {
             bufferSize = readBlock(file, buffer, offsetFile, sizeBlock);
-
             offsetFile += bufferSize;   //modify offset for input file
         }
 
