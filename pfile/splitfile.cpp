@@ -49,7 +49,7 @@ bool SplitFile::split(int countBlock)
     for (int block = 0; block < countBlock; ++block){
         auto filename = m_filename + ".part." + std::to_string(block); //filename part
         unique_ptr<char> buffer;    //reserve pointer<char> for content
-        auto bufferSize = 0L;
+        long long bufferSize = 0L;
 
         ILog("\tRead "+ to_string(block + 1) +" block <-- '" + m_filename + "'");
 
@@ -76,17 +76,20 @@ long SplitFile::getFileSize(ifstream& file) const
     return file.tellg();
 }
 
-void SplitFile::writeBlock(const std::string& filename, char *buffer, long size)
+void SplitFile::writeBlock(const std::string& filename, char *buffer, long long size)
 {
     deque<FileLine> lines; //Set lines autosorting by key
-
     auto pos = buffer;
-    for (long index = 0; index < size; index++) {
+    for (long long index = 0; index < size; index++) {
         if(buffer[index]=='\n'){    //Find symbol \n
             buffer[index] = '\0';   //cut string
             lines.push_back(FileLine(pos));  //append line in deque
             pos = buffer + (index + 1);
         }
+    }
+    if(pos < buffer + size){
+        buffer[size] = '\0';
+        lines.push_back(FileLine(pos));  //append line in deque
     }
 
 
@@ -106,7 +109,7 @@ void SplitFile::writeBlock(const std::string& filename, char *buffer, long size)
 
 }
 
-long SplitFile::readBlock(std::ifstream &file, std::unique_ptr<char>& buffer, long offset, long size, bool lastBlock)
+long long SplitFile::readBlock(std::ifstream &file, std::unique_ptr<char>& buffer, long long offset, long long size, bool lastBlock)
 {
     buffer = unique_ptr<char>(new char[size]);
     file.seekg(offset, ios::beg);

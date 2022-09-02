@@ -16,9 +16,9 @@ protected:
     void removeParts(); //Remove all parts on disk
     long getFileSize(std::ifstream& file) const;
     //Write block in .part file
-    void writeBlock(const std::string& filename, char* buffer, long size);
+    void writeBlock(const std::string& filename, char* buffer, long long size);
     //Read block from input file
-    long readBlock(std::ifstream& file, std::unique_ptr<char>& buffer, long offset, long size, bool lastBlock = false);
+    long long readBlock(std::ifstream& file, std::unique_ptr<char>& buffer, long long offset, long long size, bool lastBlock = false);
 private:
     std::string m_filename; //Input filename
     std::vector<std::string> m_parts;   //filename parts

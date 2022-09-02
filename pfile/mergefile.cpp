@@ -29,7 +29,7 @@ bool MergeFile::merge(const std::string& filename)
 
     for(size_t i = 0; i< m_files.size(); i++){
         auto opt = getNextLine(i);  //get next line from file by index
-        if(!opt->empty()) {
+        if(opt && !opt->empty()) {
             FileLine line(opt.value());
             heapLines.insert({move(line), i}); //append line in map
         }
@@ -41,7 +41,7 @@ bool MergeFile::merge(const std::string& filename)
         auto line = begin(heapLines)->first;    //get minimal pair value
         outFile << line.toLine() << "\n"; //write in output file
         heapLines.erase(begin(heapLines));  //Remove recorded line
-        if(auto opt = getNextLine(indexFile); !opt->empty()){ //get a new line from the same file
+        if(auto opt = getNextLine(indexFile); opt && !opt->empty()){ //get a new line from the same file
             line.fromLine(opt.value());
             heapLines.insert({move(line), indexFile}); //append line in map
         }
