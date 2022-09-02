@@ -2,8 +2,10 @@
 #include "exceptfile.h"
 #include "fileline.h"
 
-#include <set>
+#include <deque>
+#include <vector>
 #include <memory>
+#include <algorithm>
 #include <filesystem>
 
 #include "../iface/ilog.h"
@@ -40,9 +42,9 @@ bool SplitFile::split(int countBlock)
         throw ExceptFile(ExceptFile::Step::SPLIT, "File '" + m_filename + "' not found");
     }
 
-    long sizeFile = getFileSize(file);
-    long sizeBlock = sizeFile / countBlock;
-    long offsetFile = 0L; //Offset for input file
+    long long sizeFile = getFileSize(file);
+    long long sizeBlock = sizeFile / countBlock;
+    long long offsetFile = 0L; //Offset for input file
 
     for (int block = 0; block < countBlock; ++block){
         auto filename = m_filename + ".part." + std::to_string(block); //filename part
@@ -76,18 +78,23 @@ long SplitFile::getFileSize(ifstream& file) const
 
 void SplitFile::writeBlock(const std::string& filename, char *buffer, long size)
 {
-    multiset<FileLine> lines; //Set lines autosorting by key
+    deque<FileLine> lines; //Set lines autosorting by key
+
     auto pos = buffer;
     for (long index = 0; index < size; index++) {
         if(buffer[index]=='\n'){    //Find symbol \n
             buffer[index] = '\0';   //cut string
-            lines.insert(FileLine(pos));  //append line in set
+            lines.push_back(FileLine(pos));  //append line in deque
             pos = buffer + (index + 1);
         }
     }
 
+
+    vector vectorLines(begin(lines), end(lines));
+    sort(begin(vectorLines), end(vectorLines));
+
     stringstream stream; //intermediate buffer
-    for(auto& line : lines){
+    for(auto& line : vectorLines){
         stream << line.toLine() << "\n";
     }
     ofstream outFile(filename, ios::out | ios::binary);

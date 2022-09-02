@@ -1,7 +1,7 @@
 #include "mergefile.h"
 #include "exceptfile.h"
 #include "fileline.h"
-#include <map>
+#include <set>
 
 using namespace std;
 
@@ -25,7 +25,7 @@ MergeFile::~MergeFile()
 
 bool MergeFile::merge(const std::string& filename)
 {
-    multimap<FileLine, int> heapLines; //autosorting when inserting [Line, IndexFile]
+    multiset<pair<FileLine, int>> heapLines; //autosorting when inserting [Line, IndexFile]
 
     for(size_t i = 0; i< m_files.size(); i++){
         auto opt = getNextLine(i);  //get next line from file by index
